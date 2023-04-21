@@ -2,6 +2,9 @@ local api = vim.api
 local vfn = vim.fn
 local M = {}
 
+function M.command(opts)
+  return string.format("fzy -l %d -p %s", opts.height, vim.F.if_nil(opts.prompt, "'> '"))
+end
 
 function M.new_popup()
   local buf = api.nvim_create_buf(false, true)
@@ -103,17 +106,16 @@ function M.execute(choices_cmd, on_selection, prompt)
   local fzy
   if prompt then
     fzy = string.format(
-      '%s | fzy -l %d -p %s > "%s"',
+      '%s | %s > "%s"',
       choices_cmd,
-      height,
-      vim.fn.shellescape(prompt),
+      M.command({ height = height, prompt = vim.fn.shellescape(prompt) }),
       tmpfile
     )
   else
     fzy = string.format(
-      '%s | fzy -l %d > "%s"',
+      '%s | %s > "%s"',
       choices_cmd,
-      height,
+      M.command({ height = height }),
       tmpfile
     )
   end
